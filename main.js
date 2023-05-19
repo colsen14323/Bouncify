@@ -15,6 +15,7 @@ function Ball(x, y, velX, velY, color, size,ballNum) {
   this.color = color;
   this.size = size;
   this.ballNum = ballNum;
+  balls.push(this);
 }
 
 Ball.prototype.draw = function() {
@@ -25,11 +26,21 @@ Ball.prototype.draw = function() {
 }
 
 Ball.prototype.update = function() {
-  if((Math.abs(this.x-(width/2))+this.size>width/2)){
-    this.velX = -this.velX
+  if((this.x+this.size>width)){
+    this.velX = -Math.abs(this.velX)
+    this.x = width-this.size
   }
-  if((Math.abs(this.y-(height/2))+this.size>height/2)){
-    this.velY = -this.velY
+  if((this.x-this.size<0)){
+    this.velX = Math.abs(this.velX);
+    this.x = this.size;
+  }
+  if((this.y+this.size>height)){
+    this.velY = -Math.abs(this.velY)
+    this.y = height-this.size
+  }
+  if((this.y-this.size<0)){
+    this.velY = Math.abs(this.velY);
+    this.y = this.size;
   }
   this.colide();
   this.gravit();
@@ -44,26 +55,44 @@ Ball.prototype.colide = function() {
   for(let coliddeBall of balls){
     if(coliddeBall.ballNum!=this.ballNum){
       let dist = Math.sqrt(Math.pow(this.x-coliddeBall.x,2)+Math.pow(this.y-coliddeBall.y,2))
+      let compoundDiam = this.size+coliddeBall.size;
       if(dist<this.size+coliddeBall.size){
         //color colide
         // this.color = 'rgb(' + random(0,255) + ',' + random(0,120) + ',' + random(0,120) +')';
 
         //basic colide
-        this.velX = -this.velX
-        this.velY = -this.velY
+        // this.velX = -this.velX
+        // this.velY = -this.velY
 
         //angle colide test
-        // let velMag = Math.sqrt(Math.pow(this.velX-coliddeBall.velX,2)+Math.pow(this.velY-coliddeBall.velY,2))
-        // let colideVectorang = Math.atan2(coliddeBall.y-this.y,coliddeBall.x-this.x);
-        // let vectorVelang = Math.atan2(this.velY,this.velX);
-        // let resultVelang = vectorVelang-colideVectorang
-        // let resultXvel = -velMag*Math.cos(resultVelang);
-        // let resultYvel = velMag*Math.sin(resultVelang);
-        // let resultVelMag = Math.sqrt(Math.pow(resultXvel,2)+Math.pow(resultYvel,2))
-        // let resulterVelAng = Math.atan2(resultYvel,resultXvel);
-        // let finalVelAng = resulterVelAng+colideVectorang;
-        // this.velX = resultVelMag*Math.cos(finalVelAng);
-        // this.velY = resultVelMag*Math.sin(finalVelAng);
+        let velMag = Math.sqrt(Math.pow(this.velX,2)+Math.pow(this.velY,2))
+        let colideVectorang = Math.atan2(coliddeBall.y-this.y,coliddeBall.x-this.x);
+        let vectorVelang = Math.atan2(this.velY,this.velX);
+        let resultVelang = vectorVelang-colideVectorang
+        let resultXvel = -velMag*Math.cos(resultVelang);
+        let resultYvel = velMag*Math.sin(resultVelang);
+        let resultVelMag = Math.sqrt(Math.pow(resultXvel,2)+Math.pow(resultYvel,2))
+        let resulterVelAng = Math.atan2(resultYvel,resultXvel);
+        let finalVelAng = resulterVelAng+colideVectorang;
+        this.velX = resultVelMag*Math.cos(finalVelAng);
+        this.velY = resultVelMag*Math.sin(finalVelAng);
+
+        let ColvelMag = Math.sqrt(Math.pow(coliddeBall.velX,2)+Math.pow(coliddeBall.velY,2))
+        let ColcolideVectorang = Math.atan2(this.y-coliddeBall.y,this.x-coliddeBall.x);
+        let ColvectorVelang = Math.atan2(coliddeBall.velY,coliddeBall.velX);
+        let ColresultVelang = ColvectorVelang-ColcolideVectorang
+        let ColresultXvel = -ColvelMag*Math.cos(ColresultVelang);
+        let ColresultYvel = ColvelMag*Math.sin(ColresultVelang);
+        let ColresultVelMag = Math.sqrt(Math.pow(ColresultXvel,2)+Math.pow(ColresultYvel,2))
+        let ColresulterVelAng = Math.atan2(ColresultYvel,ColresultXvel);
+        let ColfinalVelAng = ColresulterVelAng+ColcolideVectorang;
+        coliddeBall.velX = ColresultVelMag*Math.cos(ColfinalVelAng);
+        coliddeBall.velY = ColresultVelMag*Math.sin(ColfinalVelAng);
+
+
+
+        this.x = coliddeBall.x-compoundDiam*Math.cos(colideVectorang);
+        this.y = coliddeBall.y-compoundDiam*Math.sin(colideVectorang);
 
         //momentum colide
 
@@ -109,8 +138,6 @@ while (balls.length < 4) {
     size,
     balls.length
   );
-
-  balls.push(ball);
 }
 
 function doUpdates(){
