@@ -43,7 +43,7 @@ Ball.prototype.update = function() {
     this.y = this.size;
   }
   this.colide();
-  this.gravit();
+  // this.gravit();
 }
 
 Ball.prototype.velocify = function() {
@@ -90,9 +90,10 @@ Ball.prototype.colide = function() {
         coliddeBall.velY = ColresultVelMag*Math.sin(ColfinalVelAng);
 
 
-
-        this.x = coliddeBall.x-compoundDiam*Math.cos(colideVectorang);
-        this.y = coliddeBall.y-compoundDiam*Math.sin(colideVectorang);
+        if(this.ballNum>coliddeBall.ballNum){
+          this.x = coliddeBall.x-(compoundDiam+1)*Math.cos(colideVectorang);
+          this.y = coliddeBall.y-(compoundDiam+1)*Math.sin(colideVectorang);
+        }
 
         //momentum colide
 
@@ -125,15 +126,15 @@ function random(min, max) {
 
 let balls = [];
 
-while (balls.length < 4) {
+while (balls.length < 8) {
   let size = random(20,60);
   let ball = new Ball(
     // ball position always drawn at least one ball width
     // away from the edge of the canvas, to avoid drawing errors
     random(0 + size,width - size),
     random(0 + size,height - size),
-    random(-7,7),
-    random(-7,7),
+    random(-10,10),
+    random(-10,10),
     'rgb(' + random(0,255) + ',' + random(0,120) + ',' + random(0,120) +')',
     size,
     balls.length
